@@ -41,12 +41,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("Filtr dane: " + request.getParameter("username") + " " +request.getParameter("password"));
         System.out.println(request.getRequestURI());
         if(request.getRequestURI().startsWith("/admin")) {
-//            String jwtFromRequest = request.getHeader("Authorization").substring(7);
             String jwtFromRequest = getJwtFromCookie(request);
-            System.out.println(jwtFromRequest);
-            System.out.println("lec");
             if (StringUtils.hasText(jwtFromRequest) && jwtGenerator.validateToken(jwtFromRequest)) {
-//            System.out.println("username form jwt: " + jwtGenerator.getUsernameFromJWT(tokenFromCookie));
                 String username = jwtGenerator.getUsernameFromJWT(jwtFromRequest);
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
                 List<String> roles = jwtGenerator.getRolesFromJwt(jwtFromRequest);
@@ -64,62 +60,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
-//        else {
-//            String username = request.getParameter("username");
-//            String password = request.getParameter("password");
-//            System.out.println("Logowanie: " + username + "   " + password);
-//            String header = request.getHeader("Authorization");
-//            if(header == null){
-//                filterChain.doFilter(request, response);
-//                return;
-//            }
-//
-//            System.out.println("Header: " + header);
-////            String credentials = new String(Base64.getDecoder().decode(header.substring(6)));
-////            String newUsername = credentials.split(":")[0];
-////            String newPassword = credentials.split(":")[1];
-////            System.out.println("Dane logowania z basic autha: " + newUsername + " " + newPassword + " " + credentials);
-//
-//
-////            if(username == null || password == null){
-////            if(newUsername == null || newPassword == null){
-////                filterChain.doFilter(request, response);
-////                System.out.println("check");
-////                return;
-////            }
-//
-//            if(username == null || password == null){
-//                filterChain.doFilter(request, response);
-//                System.out.println("check");
-//                return;
-//            }
-//
-//
-//            System.out.println("check 2");
-//            try {
-//                UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-//                BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//                if(passwordEncoder.matches(password, userDetails.getPassword())){
-//                    UsernamePasswordAuthenticationToken authRequest =
-//                            new UsernamePasswordAuthenticationToken(
-//                                    userDetails,
-//                                    null,
-//                                    userDetails.getAuthorities());
-//                    authRequest.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//                    SecurityContextHolder.getContext().setAuthentication(authRequest);
-//
-//                    String newToken = jwtGenerator.generateToken(authRequest);
-//                    CookieService jwtCookie = new CookieService("jwt", newToken, true, request.isSecure(),
-//                            "/", jwtGenerator.getExpirationInMillis());
-//
-//                    response.addCookie(jwtCookie);
-//                    filterChain.doFilter(request, response);
-//                    return;
-//                }
-//            }catch (UsernameNotFoundException e){
-//                filterChain.doFilter(request, response);
-//            }
-//        }
         filterChain.doFilter(request, response);
     }
 

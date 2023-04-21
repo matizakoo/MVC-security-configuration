@@ -89,12 +89,11 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("/logout")
+    @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         System.out.println(AdminController.class + " logout " + request.getParameter("username") + " " + request.getParameter("password"));
         try {
-            // Dodaj token JWT do ciasteczka
-            Cookie jwtCookie = new Cookie(CustomAuthHeader.AUTHORIZATION_HEADER, "logout");
+            Cookie jwtCookie = new Cookie(CustomAuthHeader.AUTHORIZATION_HEADER, null);
             jwtCookie.setHttpOnly(true);
             jwtCookie.setSecure(true);
             jwtCookie.setPath("/");

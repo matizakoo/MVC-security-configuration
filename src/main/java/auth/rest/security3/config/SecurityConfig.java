@@ -71,7 +71,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(login -> login
-                        .loginPage("/admin/loginpage")
+                        .loginPage("/admin/loginpage").permitAll()
 //                        .successHandler(new CustomAuthHeader(jwtGenerator))
                 )
                 .logout(logout -> logout
