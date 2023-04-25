@@ -1,5 +1,6 @@
 package auth.rest.security3.config;
 
+import auth.rest.security3.config.bruteforce.BruteForceService;
 import auth.rest.security3.config.jwt.*;
 import auth.rest.security3.repository.UsersRepository;
 import lombok.AllArgsConstructor;
@@ -32,7 +33,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @AllArgsConstructor
 public class SecurityConfig {
     private final UsersRepository usersRepository;
-    private final JwtGenerator jwtGenerator;
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -67,7 +67,8 @@ public class SecurityConfig {
                         .loginPage("/admin/loginpage").permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessHandler(new ClearJwtCookie(CustomAuthHeader.AUTHORIZATION_HEADER)))
+                        .logoutSuccessHandler(new ClearJwtCookie(CustomAuthHeader.AUTHORIZATION_HEADER))
+                )
                 .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

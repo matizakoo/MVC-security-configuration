@@ -29,7 +29,7 @@ public class CustomAuthHeader implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
-            System.out.println(CustomAuthHeader.class.toString() + " " + "test");
+//            System.out.println(CustomAuthHeader.class.toString() + " " + "test");
             String token = jwtGenerator.generateToken(authentication);
             Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
             cookie.setHttpOnly(true);

@@ -1,5 +1,6 @@
 package auth.rest.security3.controller;
 
+import auth.rest.security3.config.bruteforce.BruteForceService;
 import auth.rest.security3.config.jwt.CustomAuthHeader;
 import auth.rest.security3.config.jwt.JwtGenerator;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +31,8 @@ public class AdminController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtGenerator jwtGenerator;
+    @Autowired
+    private BruteForceService bruteForceService;
     @GetMapping("/admin")
     public String admin(){
         return "admin";
@@ -67,10 +70,15 @@ public class AdminController {
 
     @PostMapping("/auth")
     public ResponseEntity<?> auth(HttpServletRequest request, HttpServletResponse response){
-        System.out.println(AdminController.class + " auth " + request.getParameter("username") + " " + request.getParameter("password"));
+//        System.out.println(AdminController.class + " auth " + request.getParameter("username") + " " + request.getParameter("password"));
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getParameter("username"), request.getParameter("password")));
+            if(bruteForceService.isBruteForce(request.getParameter("username"))) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            bruteForceService.resetBruteCounter(request.getParameter("username"));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = jwtGenerator.generateToken(authentication);
@@ -85,13 +93,15 @@ public class AdminController {
             response.addCookie(jwtCookie);
             return ResponseEntity.ok().build();
         } catch (AuthenticationException e) {
+            String username = request.getParameter("username");
+            bruteForceService.registerLoginFailure(username);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        System.out.println(AdminController.class + " logout " + request.getParameter("username") + " " + request.getParameter("password"));
+//        System.out.println(AdminController.class + " logout " + request.getParameter("username") + " " + request.getParameter("password"));
         try {
             Cookie jwtCookie = new Cookie(CustomAuthHeader.AUTHORIZATION_HEADER, null);
             jwtCookie.setHttpOnly(true);

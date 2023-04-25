@@ -25,10 +25,10 @@ public class LoggerFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
             String name = SecurityContextHolder.getContext().getAuthentication().getName();
-            System.out.println("Name of sch: " + name);
-            System.out.println(" username form jwt: " + jwtGenerator.getUsernameFromJWT(getJwtFromCookie(request)));
+//            System.out.println("Name of sch: " + name);
+//            System.out.println(" username form jwt: " + jwtGenerator.getUsernameFromJWT(getJwtFromCookie(request)));
         } catch (Exception e){
-            System.out.println("exception");
+//            System.out.println("exception");
         }
         filterChain.doFilter(request, response);
     }

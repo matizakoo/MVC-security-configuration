@@ -28,7 +28,7 @@ public class UsersController {
 
     @GetMapping("/loginpage")
     public String loginPage(){
-        System.out.println("/xD");
+//        System.out.println("/xD");
         return "<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head>\n" +
