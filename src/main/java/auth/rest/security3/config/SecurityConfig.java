@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .securityMatcher(new AntPathRequestMatcher("/user/**", null, true))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/users/user").permitAll()
+                        .requestMatchers("/user/twofa/**").permitAll()
                         .requestMatchers("/user/users/**").authenticated()
                 )
                 .sessionManagement(session -> session

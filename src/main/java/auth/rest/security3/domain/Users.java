@@ -27,6 +27,10 @@ public class Users implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Roles role;
 
+    private String twofa;
+
+    private String number;
+
     @JsonIgnore
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Devices> devices;
