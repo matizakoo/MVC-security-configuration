@@ -37,9 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-//        System.out.println("JwtAuthenticationFilter");
-//        System.out.println("Filtr dane: " + request.getParameter("username") + " " +request.getParameter("password"));
-        System.out.println(request.getRequestURI());
         if(request.getRequestURI().startsWith("/admin")) {
             String jwtFromRequest = getJwtFromCookie(request);
             if (StringUtils.hasText(jwtFromRequest) && jwtGenerator.validateToken(jwtFromRequest)) {
@@ -49,7 +46,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Set<GrantedAuthority> authorities = roles.stream()
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toSet());
-//                System.out.println("User has role: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
 
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(
@@ -67,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(request.getCookies() == null)
             return null;
         Optional<Cookie> optionalCookie = Arrays.stream(request.getCookies())
-                .filter(cookie -> "Authorization".equals(cookie.getName()))
+                .filter(cookie -> CustomAuthHeader.AUTHORIZATION_HEADER.equals(cookie.getName()))
                 .findFirst();
         return optionalCookie.map(Cookie::getValue).orElse(null);
     }

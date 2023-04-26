@@ -67,4 +67,9 @@ public class UsersServiceImpl implements UsersService {
         users.setTwofa(twofa);
         return Optional.of(users);
     }
+
+    @Override
+    public Optional<Users> findByUsername(String username) {
+        return Optional.of(usersRepository.findByUsername(username));
+    }
 }

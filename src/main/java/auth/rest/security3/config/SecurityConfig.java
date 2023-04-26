@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .securityMatcher(new AntPathRequestMatcher("/admin/**", null, true))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/admin", "/admin/loginpage", "/admin/auth").permitAll()
+                        .requestMatchers("/admin/admin", "/admin/loginpage", "/admin/auth", "/admin/button").permitAll()
                         .requestMatchers("/admin/**").authenticated().anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

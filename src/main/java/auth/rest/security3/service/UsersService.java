@@ -18,4 +18,5 @@ public interface UsersService {
     Users save(Users users);
     Optional<Users> findById(Integer id);
     Optional<Users> findByIdForTwoFA(Integer id, String twofa);
+    Optional<Users> findByUsername(String username);
 }
