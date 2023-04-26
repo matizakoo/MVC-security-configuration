@@ -2,6 +2,7 @@ package auth.rest.security3.config;
 
 import auth.rest.security3.config.bruteforce.BruteForceService;
 import auth.rest.security3.config.jwt.*;
+import auth.rest.security3.controller.HttpsController;
 import auth.rest.security3.repository.UsersRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class SecurityConfig {
     private final UsersRepository usersRepository;
 
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @Order(1)
     public SecurityFilterChain securityFilterChainOne(HttpSecurity http) throws Exception {
         return http
                 .securityMatcher(new AntPathRequestMatcher("/user/**", null, true))
@@ -53,7 +54,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(1)
+    @Order(2)
     public SecurityFilterChain securityFilterChainTwo(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -70,6 +71,20 @@ public class SecurityConfig {
                         .logoutSuccessHandler(new ClearJwtCookie(CustomAuthHeader.AUTHORIZATION_HEADER))
                 )
                 .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+
+    @Bean
+    @Order(3)
+    public SecurityFilterChain securityFilterChainHttps(HttpSecurity http) throws Exception {
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
+                .securityMatcher(new AntPathRequestMatcher("/https/**", null, true))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/https/**").permitAll()
+                )
+                .requiresChannel(https -> https
+                        .requestMatchers("/https/**").requiresSecure())
                 .build();
     }
 
