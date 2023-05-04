@@ -12,11 +12,12 @@ public class BrutalForceCron {
     @Scheduled(initialDelay = 1000, fixedDelay = 60 * 1000)
     public void resetCounter() {
         Map<String, Integer> cache = BruteForceServiceImpl.cache;
-        for(Map.Entry<String, Integer> map : cache.entrySet()) {
-            if(map.getValue() > 0)
-                BruteForceServiceImpl.cache.put(map.getKey(), map.getValue() - 1);
-            else
-                BruteForceServiceImpl.cache.remove(map.getKey());
-        }
+        if(BruteForceServiceImpl.cache.size() != 0)
+            for(Map.Entry<String, Integer> map : cache.entrySet()) {
+                if(map.getValue() > 0)
+                    BruteForceServiceImpl.cache.put(map.getKey(), map.getValue() - 1);
+                else
+                    BruteForceServiceImpl.cache.remove(map.getKey());
+            }
     }
 }

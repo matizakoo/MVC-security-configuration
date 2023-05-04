@@ -26,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -39,10 +40,9 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain securityFilterChainOne(HttpSecurity http) throws Exception {
         return http
-                .securityMatcher(new AntPathRequestMatcher("/user/**", null, true))
+                .securityMatcher(new AntPathRequestMatcher("/user/**", null, false))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/users/user").permitAll()
-                        .requestMatchers("/user/twofa/**").permitAll()
                         .requestMatchers("/user/users/**").authenticated()
                 )
                 .sessionManagement(session -> session
@@ -58,16 +58,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChainTwo(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher(new AntPathRequestMatcher("/admin/**", null, true))
+                .securityMatcher(new AntPathRequestMatcher("/admin/**", null, false))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/admin", "/admin/loginpage", "/admin/auth", "/admin/button").permitAll()
-                        .requestMatchers("/admin/**").authenticated().anyRequest().authenticated())
+                        .requestMatchers("/admin/admin", "/admin/loginpage", "/admin/auth", "/admin/button", "/admin/successlogout", "/admin/logout").permitAll()
+                        .requestMatchers("/admin/user").hasAuthority("USER")
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(login -> login
                         .loginPage("/admin/loginpage").permitAll()
                 )
                 .logout(logout -> logout
+                        .logoutUrl("/admin/logout")
                         .logoutSuccessHandler(new ClearJwtCookie(CustomAuthHeader.AUTHORIZATION_HEADER))
                 )
                 .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -79,7 +82,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChainHttps(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher(new AntPathRequestMatcher("/https/**", null, true))
+                .securityMatcher(new AntPathRequestMatcher("/https/**", null, false))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/https/**").permitAll()
                 )

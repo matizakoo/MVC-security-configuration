@@ -36,9 +36,7 @@ public class Users implements UserDetails {
     private Set<Devices> devices;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
-    }
+    public Collection<? extends GrantedAuthority> getAuthorities() { return List.of(new SimpleGrantedAuthority(role.name())); }
 
     @Override
     public String getPassword() {

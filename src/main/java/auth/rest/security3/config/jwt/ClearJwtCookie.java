@@ -17,16 +17,16 @@ public class ClearJwtCookie extends SimpleUrlLogoutSuccessHandler {
     }
 
     @Override
-    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
+    public void onLogoutSuccess(HttpServletRequest request,
+                                HttpServletResponse response,
                                 Authentication authentication) throws IOException, ServletException {
-        if (cookiesToClear != null) {
-            for (String cookieName : cookiesToClear) {
-                Cookie cookie = new Cookie(cookieName, null);
-                cookie.setMaxAge(0);
-                cookie.setPath("/");
-                response.addCookie(cookie);
-            }
-        }
+        Cookie jwtCookie = new Cookie(CustomAuthHeader.AUTHORIZATION_HEADER, null);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(true);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(24 * 60 * 60 * 30);
+        response.addCookie(jwtCookie);
+
         super.onLogoutSuccess(request, response, authentication);
     }
 }

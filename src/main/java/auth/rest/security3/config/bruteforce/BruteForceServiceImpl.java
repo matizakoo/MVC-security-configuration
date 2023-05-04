@@ -23,6 +23,6 @@ public class BruteForceServiceImpl implements BruteForceService {
 
     @Override
     public boolean isBruteForce(String username) {
-        return cache.size() == maxFailures;
+            return cache.size() == maxFailures;
     }
 }
