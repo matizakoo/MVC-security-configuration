@@ -1,35 +1,29 @@
 package auth.rest.security3.config;
 
-import auth.rest.security3.config.bruteforce.BruteForceService;
 import auth.rest.security3.config.jwt.*;
-import auth.rest.security3.controller.HttpsController;
 import auth.rest.security3.repository.UsersRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
+import org.springframework.data.ldap.repository.config.EnableLdapRepositories;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
-import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -94,19 +88,19 @@ public class SecurityConfig {
                 .build();
     }
 
-    @Bean
-    @Order(4)
-    public SecurityFilterChain securityFilterChainLdap(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests()
-                .anyRequest().fullyAuthenticated()
-                .and()
-                .formLogin()
-                .and()
-                .logout()
-                .and()
-                .build();
-    }
+//    @Bean
+//    @Order(4)
+//    public SecurityFilterChain securityFilterChainLdap(HttpSecurity http) throws Exception {
+//        return http
+//                .authorizeHttpRequests()
+//                .anyRequest().fullyAuthenticated()
+//                .and()
+//                .formLogin()
+//                .and()
+//                .logout()
+//                .and()
+//                .build();
+//    }
 
 //    @Autowired
 //    public void configure(AuthenticationManagerBuilder auth) throws Exception {

@@ -144,6 +144,11 @@
             <groupId>com.unboundid</groupId>
             <artifactId>unboundid-ldapsdk</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-ldap</artifactId>
+            <version>3.0.3</version>
+        </dependency>
     </dependencies>
 
     <build>
