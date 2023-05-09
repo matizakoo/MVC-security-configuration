@@ -1,7 +1,7 @@
 package auth.rest.security3.service;
 
 import auth.rest.security3.domain.Person;
-import auth.rest.security3.domain.PersonVO;
+import auth.rest.security3.dto.PersonVO;
 
 import java.util.List;
 
@@ -10,5 +10,7 @@ public interface PersonService {
     List<Person> findAll();
 //    String delete(String uid);
 
-    Person find(String uid);
+    Person findByUid(String uid);
+
+    Person findByUsername(String username);
 }

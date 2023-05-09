@@ -4,6 +4,7 @@ import auth.rest.security3.config.jwt.*;
 import auth.rest.security3.repository.UsersRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -15,12 +16,15 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -101,7 +105,7 @@ public class SecurityConfig {
 //                .and()
 //                .build();
 //    }
-
+//
 //    @Autowired
 //    public void configure(AuthenticationManagerBuilder auth) throws Exception {
 //        auth
@@ -125,7 +129,7 @@ public class SecurityConfig {
 //                .url("ldap://10.5.110.200:4260/dc=sso,dc=so")
 //                .and()
 //                .passwordCompare()
-//                .passwordEncoder(NoOpPasswordEncoder.getInstance())
+//                .passwordEncoder(new LdapShaPasswordEncoder())
 //                .passwordAttribute("password123");
 //    }
 

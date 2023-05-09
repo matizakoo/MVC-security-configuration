@@ -8,6 +8,7 @@ import org.springframework.ldap.odm.annotations.Entry;
 import org.springframework.ldap.odm.annotations.Id;
 
 import javax.naming.Name;
+import java.nio.charset.StandardCharsets;
 
 @Entry(base = "ou=users",
         objectClasses = { "inetOrgPerson","organizationalPerson","person", "top" })
@@ -20,8 +21,8 @@ public final class Person implements Persistable<Name> {
     private String fullname;
     @Attribute(name="sn")
     private String lastname;
-    @Attribute(name="givenname")
-    private String givenname;
+    @Attribute(name = "userPassword", type = Attribute.Type.BINARY)
+    private byte[] password;
     @Attribute(name="description")
     private String description;
     @Attribute(name="mail")
@@ -37,5 +38,9 @@ public final class Person implements Persistable<Name> {
     @Override
     public boolean isNew() {
         return false;
+    }
+
+    public void setPasswordEncoded(String password) {
+        this.password = password.getBytes(StandardCharsets.UTF_8);
     }
 }

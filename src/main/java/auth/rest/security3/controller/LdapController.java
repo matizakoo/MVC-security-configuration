@@ -1,9 +1,11 @@
 package auth.rest.security3.controller;
 
+import auth.rest.security3.config.jwt.JwtGenerator;
+import auth.rest.security3.config.jwt.JwtGeneratorLdap;
 import auth.rest.security3.domain.Person;
-import auth.rest.security3.domain.PersonVO;
+import auth.rest.security3.dto.PersonVO;
+import auth.rest.security3.dto.UserCredentialsDTO;
 import auth.rest.security3.service.PersonServiceImpl;
-import auth.rest.security3.service.Service2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +15,10 @@ import java.util.List;
 @RequestMapping(value = LdapController.url)
 public class LdapController {
     public static final String url = "/ldap";
-
+    @Autowired
+    private JwtGeneratorLdap jwtGeneratorLdap;
     @Autowired
     private PersonServiceImpl personService;
-    @Autowired
-    private Service2 service2;
 
     @GetMapping("/test")
     public String secureMethod() {
@@ -31,18 +32,24 @@ public class LdapController {
 
     @GetMapping(value = "/find/{uid}")
     public Person find(@PathVariable String uid) {
-        return personService.find(uid);
+        return personService.findByUid(uid);
     }
 
     @PostMapping(value = "/create")
     public String create(@RequestBody PersonVO personVO) {
-        System.out.println("controller");
         personService.create(personVO);
-        return "zreloaduj entries w tym chujowym apaczu";
+        return "zreloaduj entries w apaczu";
     }
 
-//    @DeleteMapping(value = "/delete")
-//    public String delete(@PathVariable String uid) {
-//        return personService.delete(uid);
-//    }
+    @PostMapping("/auth")
+    public String token(@RequestBody UserCredentialsDTO userCredentialsDTO) {
+        Person person = personService.findByUsernameWithCorrectCredentials(
+                userCredentialsDTO.getUsername(), userCredentialsDTO.getPassword());
+        return jwtGeneratorLdap.generateTokenLdap(person);
+    }
+
+    @PostMapping("/valid/{token}")
+    public boolean isValid(@PathVariable("token") String token) {
+        return jwtGeneratorLdap.validateTokenLdap(token);
+    }
 }

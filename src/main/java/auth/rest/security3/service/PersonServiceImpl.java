@@ -1,14 +1,21 @@
 package auth.rest.security3.service;
 
 import auth.rest.security3.domain.Person;
-import auth.rest.security3.domain.PersonVO;
-import auth.rest.security3.repository.PersonRepository;
+import auth.rest.security3.dto.PersonVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.query.LdapQueryBuilder;
+import org.springframework.ldap.filter.AndFilter;
+import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.ldap.support.LdapNameBuilder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import static org.springframework.ldap.query.LdapQueryBuilder.query;
@@ -17,6 +24,10 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
 public class PersonServiceImpl implements PersonService{
     @Autowired
     private LdapTemplate ldapTemplate;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Override
     public void create(PersonVO p) {
@@ -27,7 +38,7 @@ public class PersonServiceImpl implements PersonService{
         person.setFullname(p.getFullname());
         person.setLastname(p.getLastname());
         person.setDescription(p.getDescription());
-        person.setGivenname(p.getGivenname());
+        person.setPasswordEncoded(p.getPassword());
         person.setMail(p.getMail());
         person.setUid(p.getUid());
         System.out.println("3");
@@ -41,15 +52,24 @@ public class PersonServiceImpl implements PersonService{
     }
 
     @Override
-    public Person find(String uid) {
+    public Person findByUid(String uid) {
         return ldapTemplate.findOne(query().base("ou=people").where("uid").is(uid), Person.class);
     }
 
+    @Override
+    public Person findByUsername(String username) {
+        Person person = ldapTemplate.findOne(query().base("ou=people").where("cn").is(username), Person.class);
+        return person;
+    }
 
-//    @Override
-//    public String delete(String uid) {
-//        Person p = personRepository.findOne(LdapQueryBuilder.query().where("uid").is(uid)).get();
-//        personRepository.delete(p);
-//        return "delete";
-//    }
+    public Person findByUsernameWithCorrectCredentials(String username, String password) {
+        Person person = findByUsername(username);
+        if(person == null)
+            return null;
+
+        if(new LdapShaPasswordEncoder().matches(password, new String(person.getPassword())))
+            return person;
+
+        return null;
+    }
 }

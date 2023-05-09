@@ -57,8 +57,4 @@ public class JwtGenerator {
             throw new AuthenticationCredentialsNotFoundException("JWT problem expired or incorrect :(");
         }
     }
-
-    public int getExpirationInMillis(){
-        return JwtConstants.JWT_EXPIRATION;
-    }
 }
