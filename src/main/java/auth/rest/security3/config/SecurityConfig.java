@@ -4,27 +4,20 @@ import auth.rest.security3.config.jwt.*;
 import auth.rest.security3.repository.UsersRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.ldap.repository.config.EnableLdapRepositories;
-import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -54,29 +47,29 @@ public class SecurityConfig {
                 .build();
     }
 
-    @Bean
-    @Order(2)
-    public SecurityFilterChain securityFilterChainTwo(HttpSecurity http) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher(new AntPathRequestMatcher("/admin/**", null, false))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/admin", "/admin/loginpage", "/admin/auth", "/admin/button", "/admin/successlogout", "/admin/logout").permitAll()
-                        .requestMatchers("/admin/user").hasAuthority("USER")
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .formLogin(login -> login
-                        .loginPage("/admin/loginpage").permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/admin/logout")
-                        .logoutSuccessHandler(new ClearJwtCookie(CustomAuthHeader.AUTHORIZATION_HEADER))
-                )
-                .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+//    @Bean
+//    @Order(2)
+//    public SecurityFilterChain securityFilterChainTwo(HttpSecurity http) throws Exception {
+//        return http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .securityMatcher(new AntPathRequestMatcher("/admin/**", null, false))
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/admin/admin", "/admin/loginpage", "/admin/auth", "/admin/button", "/admin/successlogout", "/admin/logout").permitAll()
+//                        .requestMatchers("/admin/user").hasAuthority("USER")
+//                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+//                )
+//                .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .formLogin(login -> login
+//                        .loginPage("/admin/loginpage").permitAll()
+//                )
+//                .logout(logout -> logout
+//                        .logoutUrl("/admin/logout")
+//                        .logoutSuccessHandler(new ClearJwtCookie(CustomAuthHeader.AUTHORIZATION_HEADER))
+//                )
+//                .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .build();
+//    }
 
     @Bean
     @Order(3)
@@ -92,46 +85,31 @@ public class SecurityConfig {
                 .build();
     }
 
-//    @Bean
-//    @Order(4)
-//    public SecurityFilterChain securityFilterChainLdap(HttpSecurity http) throws Exception {
-//        return http
-//                .authorizeHttpRequests()
-//                .anyRequest().fullyAuthenticated()
-//                .and()
-//                .formLogin()
-//                .and()
-//                .logout()
-//                .and()
-//                .build();
-//    }
-//
-//    @Autowired
-//    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth
-//                .ldapAuthentication()
-//                .userDnPatterns("uid={0},ou=people")
-//                .groupSearchBase("ou=groups")
-//                .contextSource()
-//                .url("ldap://localhost:8389/dc=springframework,dc=org")
-//                .and()
-//                .passwordCompare()
-//                .passwordEncoder(new BCryptPasswordEncoder())
-//                .passwordAttribute("userPassword");
-//    }
+    @Bean
+    @Order(4)
+    public SecurityFilterChain securityFilterChainLdap(HttpSecurity http) throws Exception {
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
+                .securityMatcher(new AntPathRequestMatcher("/ldap/**", null, false))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/ldap/findby/**").permitAll()
+                        .requestMatchers("/ldap/auth").permitAll()
+                        .requestMatchers("/ldap/findbyemail/**").permitAll()
+                        .requestMatchers("/ldap/jwt/**").permitAll()
+                        .requestMatchers("/ldap/user").hasAuthority("USER")
+                        .requestMatchers("/ldap/admin").hasAuthority("ADMIN")
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtLdapAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
 
-//    @Autowired
-//    public void configureLdap(AuthenticationManagerBuilder auth) throws Exception {
-//        auth
-//                .ldapAuthentication()
-//                .userDnPatterns("ou=people")
-//                .contextSource()
-//                .url("ldap://10.5.110.200:4260/dc=sso,dc=so")
-//                .and()
-//                .passwordCompare()
-//                .passwordEncoder(new LdapShaPasswordEncoder())
-//                .passwordAttribute("password123");
-//    }
+    @Bean
+    public JwtLdapAuthenticationFilter jwtLdapAuthenticationFilter() { return new JwtLdapAuthenticationFilter(); }
+
+//    @Bean
+//    public JwtAuthenticationFilter authenticationFilter() { return new JwtAuthenticationFilter(); }
 
     @Bean
     public AuthenticationManager authManager(UserDetailsService userDetailsService) {
@@ -139,11 +117,6 @@ public class SecurityConfig {
         authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(new BCryptPasswordEncoder());
         return new ProviderManager(authenticationProvider);
-    }
-
-    @Bean
-    public JwtAuthenticationFilter authenticationFilter(){
-        return new JwtAuthenticationFilter();
     }
 
     @Bean

@@ -1,5 +1,6 @@
 package auth.rest.security3.service;
 
+import auth.rest.security3.domain.People;
 import auth.rest.security3.domain.Person;
 import auth.rest.security3.dto.PersonVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,7 @@ public class PersonServiceImpl implements PersonService{
         return person;
     }
 
+    @Override
     public Person findByUsernameWithCorrectCredentials(String username, String password) {
         Person person = findByUsername(username);
         if(person == null)
@@ -71,5 +73,21 @@ public class PersonServiceImpl implements PersonService{
             return person;
 
         return null;
+    }
+
+    @Override
+    public People findByCn(String cn) {
+        People people = ldapTemplate.findOne(query().base("ou=people").where("cn").is(cn), People.class);
+        return people;
+    }
+
+    @Override
+    public List<People> all() {
+        return ldapTemplate.findAll(People.class);
+    }
+
+    @Override
+    public People findByEmail(String email) {
+        return ldapTemplate.findOne(query().base("ou=people").where("emailContext").is(email), People.class);
     }
 }
