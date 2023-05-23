@@ -1,5 +1,6 @@
-package auth.rest.security3.config.jwt;
+package auth.rest.security3.config.ldap;
 
+import auth.rest.security3.config.jwt.JwtConstants;
 import auth.rest.security3.domain.People;
 import auth.rest.security3.domain.Person;
 import io.jsonwebtoken.Claims;
@@ -9,17 +10,17 @@ import io.jsonwebtoken.io.IOException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Component
 @Qualifier
 public class JwtGeneratorLdap {
     private KeyStore keyStore;
-
     @Value("${ldap.admin.list}")
     private String[] adminList;
 
@@ -56,8 +57,6 @@ public class JwtGeneratorLdap {
                 .claim("lastLoginDate", people.getLastLoginDate())
                 .claim("lastBadLoginDate", people.getLastBadLoginDate())
                 .claim("businessId", people.getBusinessId())
-//                .setIssuedAt(new Date())
-//                .setExpiration(new Date(new Date().getTime() + JwtConstants.JWT_EXPIRATION))
                 .signWith(getPrivateKey(), SignatureAlgorithm.RS256)
                 .compact();
     }
@@ -74,7 +73,7 @@ public class JwtGeneratorLdap {
         try {
             return (PrivateKey) keyStore.getKey("sm", "password".toCharArray());
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-            throw new RuntimeException("Problem with private key from keystore");
+            throw new RuntimeException("Problem with private key");
         }
     }
 

@@ -4,7 +4,7 @@ import auth.rest.security3.service.PersonService;
 import auth.rest.security3.service.PersonServiceImpl;
 import auth.rest.security3.service.Service2;
 import auth.rest.security3.service.ServiceImpl;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.ldap.repository.config.EnableLdapRepositories;
@@ -14,23 +14,22 @@ import org.springframework.ldap.core.support.LdapContextSource;
 @Configuration
 @EnableLdapRepositories
 public class LdapConfig {
-//    @Bean
-//    public LdapContextSource ldapContextSource() {
-//        LdapContextSource ldapContextSource = new LdapContextSource();
-//        ldapContextSource.setUrl("ldap://localhost:10389");
-//        ldapContextSource.setBase("dc=example,dc=com");
-//        ldapContextSource.setUserDn("uid=admin,ou=system");
-//        ldapContextSource.setPassword("secret");
-//        return ldapContextSource;
-//    }
+    @Value("${ldap.user}")
+    private String user;
+    @Value("${ldap.dn.base}")
+    private String base;
+    @Value("${ldap.url}")
+    private String url;
+    @Value("${ldap.password}")
+    private String password;
 
     @Bean
     public LdapContextSource ldapContextSource() {
         LdapContextSource ldapContextSource = new LdapContextSource();
-        ldapContextSource.setUrl("ldap://10.5.110.200:4260");
-        ldapContextSource.setBase("dc=sso,dc=so");
-        ldapContextSource.setUserDn("cn=Directory Manager");
-        ldapContextSource.setPassword("password123");
+        ldapContextSource.setUrl(url);
+        ldapContextSource.setBase(base);
+        ldapContextSource.setUserDn(user);
+        ldapContextSource.setPassword(password);
         return ldapContextSource;
     }
 

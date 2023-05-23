@@ -4,6 +4,7 @@ import auth.rest.security3.domain.People;
 import auth.rest.security3.domain.Person;
 import auth.rest.security3.dto.PersonVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.filter.AndFilter;
 import org.springframework.ldap.filter.EqualsFilter;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import static org.springframework.ldap.query.LdapQueryBuilder.query;
 
+@Primary
 @Service
 public class PersonServiceImpl implements PersonService{
     @Autowired
@@ -32,19 +34,15 @@ public class PersonServiceImpl implements PersonService{
 
     @Override
     public void create(PersonVO p) {
-        System.out.println("1");
         Person person = new Person();
         person.setDn(LdapNameBuilder.newInstance(p.getDn()).build());
-        System.out.println("2");
         person.setFullname(p.getFullname());
         person.setLastname(p.getLastname());
         person.setDescription(p.getDescription());
         person.setPasswordEncoded(p.getPassword());
         person.setMail(p.getMail());
         person.setUid(p.getUid());
-        System.out.println("3");
         ldapTemplate.create(person);
-        System.out.println("4");
     }
 
     @Override
@@ -77,7 +75,9 @@ public class PersonServiceImpl implements PersonService{
 
     @Override
     public People findByCn(String cn) {
-        People people = ldapTemplate.findOne(query().base("ou=people").where("cn").is(cn), People.class);
+        People people = ldapTemplate.findOne(query()
+                .base("ou=people")
+                .where("cn").is(cn), People.class);
         return people;
     }
 
@@ -88,6 +88,21 @@ public class PersonServiceImpl implements PersonService{
 
     @Override
     public People findByEmail(String email) {
-        return ldapTemplate.findOne(query().base("ou=people").where("emailContext").is(email), People.class);
+        return ldapTemplate.findOne(query()
+                .base("ou=people")
+                .where("emailContext")
+                .is(email), People.class);
+    }
+
+    @Override
+    public People findPeopleByUsernameWuthCorrectCredentials(String username, String password) {
+        People people = findByEmail(username);
+        if(people == null)
+            return null;
+
+        if(new LdapShaPasswordEncoder().matches(password, new String(people.getPassword())))
+            return people;
+
+        return null;
     }
 }

@@ -16,4 +16,5 @@ public interface PersonService {
     People findByCn(String cn);
     List<People> all();
     People findByEmail(String email);
+    People findPeopleByUsernameWuthCorrectCredentials(String username, String password);
 }

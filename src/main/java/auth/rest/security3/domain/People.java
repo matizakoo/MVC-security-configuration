@@ -37,6 +37,8 @@ public class People implements Persistable<Name> {
 
     @Attribute(name = "businessId")
     private String businessId;
+    @Attribute(name = "password")
+    private String password;
 
     @Override
     public Name getId() {

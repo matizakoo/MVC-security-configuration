@@ -1,7 +1,10 @@
 package auth.rest.security3.config;
 
-import auth.rest.security3.config.jwt.*;
+import auth.rest.security3.config.ldap.JwtLdapAuthorizationAttackFilter;
+import auth.rest.security3.config.ldap.JwtLdapAuthenticationFilter;
 import auth.rest.security3.repository.UsersRepository;
+import auth.rest.security3.service.AttackService;
+import auth.rest.security3.service.AttackServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +32,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @AllArgsConstructor
 public class SecurityConfig {
     private final UsersRepository usersRepository;
+    private final AttackService attackService;
 
     @Bean
     @Order(1)
@@ -94,14 +98,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/ldap/findby/**").permitAll()
                         .requestMatchers("/ldap/auth").permitAll()
+                        .requestMatchers("/ldap/login").permitAll()
                         .requestMatchers("/ldap/findbyemail/**").permitAll()
                         .requestMatchers("/ldap/jwt/**").permitAll()
+                        .requestMatchers("/ldap/omno/**").permitAll()
                         .requestMatchers("/ldap/user").hasAuthority("USER")
                         .requestMatchers("/ldap/admin").hasAuthority("ADMIN")
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtLdapAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(jwtLdapAuthenticationAttackFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -109,7 +116,8 @@ public class SecurityConfig {
     public JwtLdapAuthenticationFilter jwtLdapAuthenticationFilter() { return new JwtLdapAuthenticationFilter(); }
 
 //    @Bean
-//    public JwtAuthenticationFilter authenticationFilter() { return new JwtAuthenticationFilter(); }
+//    public JwtLdapAuthorizationAttackFilter jwtLdapAuthenticationAttackFilter() { return new JwtLdapAuthorizationAttackFilter(); }
+
 
     @Bean
     public AuthenticationManager authManager(UserDetailsService userDetailsService) {
